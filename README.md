@@ -39,7 +39,18 @@ Use these two entities for alerts.
 
 ## Installation
 
-### HACS
+### Marketplace (Home Assistant 2026.11 and newer)
+
+Starting with 2026.11, HACS is built into Home Assistant as the **Marketplace**. There is nothing to install first.
+
+1. Go to **Settings → Marketplace**. On first use, accept the warning; until you do, nothing can be installed.
+2. In the upper-right corner, select **Add from link**.
+3. Under **GitHub link**, enter `Strojmak/ha-wallecube` and select **Add**. If you are asked for a type, choose the integration type and select **Add** again.
+4. Adding a repository from a link needs a GitHub connection. Home Assistant shows a code and a link. Open the link, sign in to GitHub, enter the code and approve. The connection gets no access to private repositories and cannot change anything on GitHub.
+5. Open **WalleCube UPS**, select **Install**, check the version and select **Install** again.
+6. Home Assistant may need a restart. If it does, a repair under **Settings → System → Repairs** tells you so and can restart for you.
+
+### HACS (Home Assistant 2026.10 and older)
 
 1. HACS → ⋮ → **Custom repositories** → add `https://github.com/Strojmak/ha-wallecube`, type **Integration**.
 2. Install **WalleCube UPS** and restart Home Assistant.
