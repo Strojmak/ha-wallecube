@@ -1,0 +1,134 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "WalleCube UPS",
+        "description": "Вхід до хмарного облікового запису WalleCube, до якого ДБЖ додано через застосунок WalleCube.",
+        "menu_options": {
+          "email": "Увійти за кодом із листа",
+          "token": "Ввести токен доступу"
+        }
+      },
+      "reauth_confirm": {
+        "title": "Повторний вхід",
+        "description": "Хмара WalleCube більше не приймає збережений токен. Увійдіть знову до того самого облікового запису.",
+        "menu_options": {
+          "email": "Увійти за кодом із листа",
+          "token": "Ввести токен доступу"
+        }
+      },
+      "email": {
+        "title": "E-mail",
+        "description": "E-mail облікового запису в застосунку WalleCube. На нього прийде одноразовий код входу.",
+        "data": {
+          "username": "E-mail"
+        }
+      },
+      "code": {
+        "title": "Код входу",
+        "description": "Введіть код із листа, надісланого на {username}.",
+        "data": {
+          "code": "Код"
+        }
+      },
+      "token": {
+        "title": "Токен доступу",
+        "description": "Bearer-токен облікового запису застосунку WalleCube, без слова «Bearer».",
+        "data": {
+          "token": "Токен"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Хмара WalleCube недоступна.",
+      "invalid_code": "Код неправильний або застарів.",
+      "invalid_auth": "Хмара відхилила токен.",
+      "send_code_failed": "Хмара відмовилася надіслати код на цей e-mail.",
+      "unknown": "Неочікувана помилка."
+    },
+    "abort": {
+      "already_configured": "Цей обліковий запис уже додано.",
+      "reauth_successful": "Вхід виконано.",
+      "wrong_account": "Це інший обліковий запис WalleCube.",
+      "unknown": "Неочікувана помилка."
+    }
+  },
+  "entity": {
+    "sensor": {
+      "input_voltage": {
+        "name": "Напруга на вході"
+      },
+      "input_current": {
+        "name": "Струм на вході"
+      },
+      "input_power": {
+        "name": "Потужність на вході"
+      },
+      "output_voltage": {
+        "name": "Напруга на виході"
+      },
+      "output_current": {
+        "name": "Струм на виході"
+      },
+      "output_power": {
+        "name": "Потужність на виході"
+      },
+      "battery_voltage": {
+        "name": "Напруга батареї"
+      },
+      "battery_current": {
+        "name": "Струм батареї"
+      },
+      "battery_power": {
+        "name": "Потужність батареї"
+      },
+      "time_left": {
+        "name": "Залишилось часу"
+      },
+      "energy_out": {
+        "name": "Віддано енергії"
+      },
+      "battery_health": {
+        "name": "Стан батареї"
+      },
+      "battery_cycles": {
+        "name": "Цикли батареї"
+      },
+      "cell_spread": {
+        "name": "Розбаланс комірок"
+      },
+      "adapter_voltage": {
+        "name": "Налаштування напруги адаптера"
+      },
+      "adapter_current": {
+        "name": "Налаштування струму адаптера"
+      },
+      "last_report": {
+        "name": "Останній звіт"
+      },
+      "cell_1_voltage": {
+        "name": "Напруга комірки 1"
+      },
+      "cell_2_voltage": {
+        "name": "Напруга комірки 2"
+      },
+      "cell_3_voltage": {
+        "name": "Напруга комірки 3"
+      },
+      "cell_4_voltage": {
+        "name": "Напруга комірки 4"
+      }
+    },
+    "binary_sensor": {
+      "on_grid": {
+        "name": "Живлення на вході"
+      },
+      "discharging": {
+        "name": "Розряд"
+      },
+      "overload": {
+        "name": "Перевантаження"
+      }
+    }
+  }
+}

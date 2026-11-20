@@ -1,0 +1,134 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "WalleCube UPS",
+        "description": "Sign in to the WalleCube cloud account that the UPS units are added to in the WalleCube app.",
+        "menu_options": {
+          "email": "Sign in with a code sent by e-mail",
+          "token": "Enter an access token"
+        }
+      },
+      "reauth_confirm": {
+        "title": "Sign in again",
+        "description": "The WalleCube cloud no longer accepts the saved token. Sign in again to the same account.",
+        "menu_options": {
+          "email": "Sign in with a code sent by e-mail",
+          "token": "Enter an access token"
+        }
+      },
+      "email": {
+        "title": "E-mail",
+        "description": "E-mail of the WalleCube app account. A one-time login code will be sent to it.",
+        "data": {
+          "username": "E-mail"
+        }
+      },
+      "code": {
+        "title": "Login code",
+        "description": "Enter the code sent to {username}.",
+        "data": {
+          "code": "Code"
+        }
+      },
+      "token": {
+        "title": "Access token",
+        "description": "Bearer token of the WalleCube app account, without the word \"Bearer\".",
+        "data": {
+          "token": "Token"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Cannot reach the WalleCube cloud.",
+      "invalid_code": "The code is wrong or has expired.",
+      "invalid_auth": "The cloud rejected the token.",
+      "send_code_failed": "The cloud refused to send a code to this e-mail.",
+      "unknown": "Unexpected error."
+    },
+    "abort": {
+      "already_configured": "This account is already configured.",
+      "reauth_successful": "Signed in again.",
+      "wrong_account": "This is a different WalleCube account.",
+      "unknown": "Unexpected error."
+    }
+  },
+  "entity": {
+    "sensor": {
+      "input_voltage": {
+        "name": "Input voltage"
+      },
+      "input_current": {
+        "name": "Input current"
+      },
+      "input_power": {
+        "name": "Input power"
+      },
+      "output_voltage": {
+        "name": "Output voltage"
+      },
+      "output_current": {
+        "name": "Output current"
+      },
+      "output_power": {
+        "name": "Output power"
+      },
+      "battery_voltage": {
+        "name": "Battery voltage"
+      },
+      "battery_current": {
+        "name": "Battery current"
+      },
+      "battery_power": {
+        "name": "Battery power"
+      },
+      "time_left": {
+        "name": "Time left"
+      },
+      "energy_out": {
+        "name": "Energy delivered"
+      },
+      "battery_health": {
+        "name": "Battery health"
+      },
+      "battery_cycles": {
+        "name": "Battery cycles"
+      },
+      "cell_spread": {
+        "name": "Cell voltage spread"
+      },
+      "adapter_voltage": {
+        "name": "Adapter voltage setting"
+      },
+      "adapter_current": {
+        "name": "Adapter current setting"
+      },
+      "last_report": {
+        "name": "Last report"
+      },
+      "cell_1_voltage": {
+        "name": "Cell 1 voltage"
+      },
+      "cell_2_voltage": {
+        "name": "Cell 2 voltage"
+      },
+      "cell_3_voltage": {
+        "name": "Cell 3 voltage"
+      },
+      "cell_4_voltage": {
+        "name": "Cell 4 voltage"
+      }
+    },
+    "binary_sensor": {
+      "on_grid": {
+        "name": "Input power"
+      },
+      "discharging": {
+        "name": "Discharging"
+      },
+      "overload": {
+        "name": "Overload"
+      }
+    }
+  }
+}

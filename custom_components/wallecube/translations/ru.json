@@ -1,0 +1,134 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "WalleCube UPS",
+        "description": "Вход в облачную учётную запись WalleCube, в которую ИБП добавлены через приложение WalleCube.",
+        "menu_options": {
+          "email": "Войти по коду из письма",
+          "token": "Ввести токен доступа"
+        }
+      },
+      "reauth_confirm": {
+        "title": "Повторный вход",
+        "description": "Облако WalleCube больше не принимает сохранённый токен. Войдите снова в ту же учётную запись.",
+        "menu_options": {
+          "email": "Войти по коду из письма",
+          "token": "Ввести токен доступа"
+        }
+      },
+      "email": {
+        "title": "E-mail",
+        "description": "E-mail учётной записи в приложении WalleCube. На него придёт одноразовый код входа.",
+        "data": {
+          "username": "E-mail"
+        }
+      },
+      "code": {
+        "title": "Код входа",
+        "description": "Введите код из письма, отправленного на {username}.",
+        "data": {
+          "code": "Код"
+        }
+      },
+      "token": {
+        "title": "Токен доступа",
+        "description": "Bearer-токен учётной записи приложения WalleCube, без слова «Bearer».",
+        "data": {
+          "token": "Токен"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Облако WalleCube недоступно.",
+      "invalid_code": "Код неверный или устарел.",
+      "invalid_auth": "Облако отклонило токен.",
+      "send_code_failed": "Облако отказалось отправить код на этот e-mail.",
+      "unknown": "Непредвиденная ошибка."
+    },
+    "abort": {
+      "already_configured": "Эта учётная запись уже добавлена.",
+      "reauth_successful": "Вход выполнен.",
+      "wrong_account": "Это другая учётная запись WalleCube.",
+      "unknown": "Непредвиденная ошибка."
+    }
+  },
+  "entity": {
+    "sensor": {
+      "input_voltage": {
+        "name": "Напряжение на входе"
+      },
+      "input_current": {
+        "name": "Ток на входе"
+      },
+      "input_power": {
+        "name": "Мощность на входе"
+      },
+      "output_voltage": {
+        "name": "Напряжение на выходе"
+      },
+      "output_current": {
+        "name": "Ток на выходе"
+      },
+      "output_power": {
+        "name": "Мощность на выходе"
+      },
+      "battery_voltage": {
+        "name": "Напряжение батареи"
+      },
+      "battery_current": {
+        "name": "Ток батареи"
+      },
+      "battery_power": {
+        "name": "Мощность батареи"
+      },
+      "time_left": {
+        "name": "Осталось времени"
+      },
+      "energy_out": {
+        "name": "Отдано энергии"
+      },
+      "battery_health": {
+        "name": "Здоровье батареи"
+      },
+      "battery_cycles": {
+        "name": "Циклы батареи"
+      },
+      "cell_spread": {
+        "name": "Разбаланс ячеек"
+      },
+      "adapter_voltage": {
+        "name": "Настройка напряжения адаптера"
+      },
+      "adapter_current": {
+        "name": "Настройка тока адаптера"
+      },
+      "last_report": {
+        "name": "Последний отчёт"
+      },
+      "cell_1_voltage": {
+        "name": "Напряжение ячейки 1"
+      },
+      "cell_2_voltage": {
+        "name": "Напряжение ячейки 2"
+      },
+      "cell_3_voltage": {
+        "name": "Напряжение ячейки 3"
+      },
+      "cell_4_voltage": {
+        "name": "Напряжение ячейки 4"
+      }
+    },
+    "binary_sensor": {
+      "on_grid": {
+        "name": "Питание на входе"
+      },
+      "discharging": {
+        "name": "Разряд"
+      },
+      "overload": {
+        "name": "Перегрузка"
+      }
+    }
+  }
+}
