@@ -95,6 +95,14 @@ def _field(key: str) -> Callable[[Log], float | None]:
     return lambda log: _num(log, key)
 
 
+def _int_field(key: str) -> Callable[[Log], int | None]:
+    def get(log: Log) -> int | None:
+        value = _num(log, key)
+        return None if value is None else round(value)
+
+    return get
+
+
 V = UnitOfElectricPotential.VOLT
 A = UnitOfElectricCurrent.AMPERE
 M = SensorStateClass.MEASUREMENT
@@ -104,7 +112,7 @@ SENSORS: tuple[WalleCubeSensorDescription, ...] = (
     WalleCubeSensorDescription(
         key="battery", device_class=SensorDeviceClass.BATTERY,
         native_unit_of_measurement=PERCENTAGE, state_class=M,
-        value_fn=_field("batteryCapacity"),
+        value_fn=_int_field("batteryCapacity"),
     ),
     WalleCubeSensorDescription(
         key="input_voltage", translation_key="input_voltage",
@@ -182,7 +190,7 @@ SENSORS: tuple[WalleCubeSensorDescription, ...] = (
     WalleCubeSensorDescription(
         key="battery_cycles", translation_key="battery_cycles",
         state_class=SensorStateClass.TOTAL_INCREASING, entity_category=DIAG,
-        value_fn=_field("batteryCycles"),
+        value_fn=_int_field("batteryCycles"),
     ),
     WalleCubeSensorDescription(
         key="cell_spread", translation_key="cell_spread",
