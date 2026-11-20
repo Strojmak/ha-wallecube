@@ -25,7 +25,12 @@ Every UPS in your WalleCube account becomes a device in Home Assistant. Units ad
 | Battery health, cycles, cell voltage spread, last report | Diagnostic |
 | Cell 1–4 voltage, adapter voltage / current settings | Diagnostic, disabled by default |
 
-The cloud is polled once a minute with one request for all units. A unit whose last report is older than 10 minutes is shown as unavailable. The **Online** entity stays available, and **Last report** keeps the last known time even while the cloud is unreachable, so you can alert on them.
+The cloud is polled once a minute. One request covers all units; an account whose list spans several pages needs one request per page. A unit whose last report is older than 10 minutes is shown as unavailable.
+
+- **Online** stays available while the cloud answers, and turns off when the unit is offline or its data is stale. When the cloud itself cannot be reached, Online becomes unavailable too, so an old state is never shown as current.
+- **Last report** keeps the last known time even while the cloud is unreachable.
+
+Use these two entities for alerts.
 
 ## Requirements
 

@@ -150,11 +150,12 @@ class WalleCubeApi:
     async def get_devices(self) -> list[dict[str, Any]]:
         """Return all UPS units of the account, each with its latest ``log``.
 
-        The list is paginated (``?page=N``, ``pagination.nextPageUrl``). All
-        pages are read; a list shorter than the reported ``total`` is treated
-        as a failed update so that a partial answer never hides units.
+        The list is paginated (``?page=N``, ``pagination.nextPageUrl``). Pages
+        are read until ``nextPageUrl`` is empty, even if a page in between has
+        no items. When the cloud reports ``total``, fewer unique units than
+        that fails the update, so a partial answer never replaces a full one.
         """
-        devices: list[dict[str, Any]] = []
+        devices: dict[str, dict[str, Any]] = {}
         total: int | None = None
         for page in range(1, MAX_PAGES + 1):
             payload = await self._request(
@@ -163,11 +164,14 @@ class WalleCubeApi:
             data = payload.get("data")
             if not isinstance(data, list):
                 raise WalleCubeConnectionError("Device list missing")
-            devices.extend(d for d in data if isinstance(d, dict) and d.get("imei"))
-            if isinstance(payload.get("total"), int):
-                total = payload["total"]
+            for dev in data:
+                if isinstance(dev, dict) and dev.get("imei"):
+                    devices.setdefault(str(dev["imei"]), dev)
+            reported = _as_int(payload.get("total"))
+            if reported is not None:
+                total = reported
             pagination = payload.get("pagination")
-            if not (isinstance(pagination, dict) and pagination.get("nextPageUrl")) or not data:
+            if not (isinstance(pagination, dict) and pagination.get("nextPageUrl")):
                 break
         else:
             raise WalleCubeConnectionError("Too many device pages")
@@ -175,4 +179,15 @@ class WalleCubeApi:
             raise WalleCubeConnectionError(
                 f"Incomplete device list: {len(devices)} of {total}"
             )
-        return devices
+        return list(devices.values())
+
+
+def _as_int(value: Any) -> int | None:
+    """``total`` as an int; numeric strings are accepted, anything else is not."""
+    if isinstance(value, bool):
+        return None
+    if isinstance(value, int):
+        return value
+    if isinstance(value, str) and value.strip().isdigit():
+        return int(value.strip())
+    return None
