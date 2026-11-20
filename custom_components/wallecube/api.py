@@ -169,9 +169,15 @@ class WalleCubeApi:
                     devices.setdefault(str(dev["imei"]), dev)
             reported = _as_int(payload.get("total"))
             if reported is not None:
+                if reported < 0:
+                    raise WalleCubeConnectionError(f"Invalid total: {reported}")
                 total = reported
+            # The cloud always sends this block; without it the end of the
+            # list cannot be told apart from a truncated answer.
             pagination = payload.get("pagination")
-            if not (isinstance(pagination, dict) and pagination.get("nextPageUrl")):
+            if not isinstance(pagination, dict) or "nextPageUrl" not in pagination:
+                raise WalleCubeConnectionError("Pagination info missing")
+            if not pagination["nextPageUrl"]:
                 break
         else:
             raise WalleCubeConnectionError("Too many device pages")

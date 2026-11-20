@@ -7,6 +7,7 @@ import importlib.util
 from pathlib import Path
 from typing import Any, Callable
 
+import aiohttp
 import pytest
 
 _SPEC = importlib.util.spec_from_file_location(
@@ -34,17 +35,34 @@ class FakeResponse:
         return False
 
 
+class RaisingResponse:
+    """A request that fails before any response, like a network error."""
+
+    def __init__(self, exc: BaseException) -> None:
+        self._exc = exc
+
+    async def __aenter__(self) -> None:
+        raise self._exc
+
+    async def __aexit__(self, *exc: Any) -> bool:
+        return False
+
+
 class FakeSession:
     """Answers each request with ``responder(params)`` and records the params."""
 
-    def __init__(self, responder: Callable[[dict | None], FakeResponse]) -> None:
+    def __init__(self, responder: Callable[[dict | None], Any]) -> None:
         self._responder = responder
         self.calls: list[dict | None] = []
+        self.requests: list[dict] = []
 
     def request(self, method, url, *, json=None, params=None, headers=None,
                 timeout=None, allow_redirects=True):
         assert allow_redirects is False
         self.calls.append(params)
+        self.requests.append(
+            {"method": method, "url": url, "json": json, "headers": headers or {}}
+        )
         return self._responder(params)
 
 
@@ -179,3 +197,58 @@ def test_login_without_token_fails() -> None:
     session = FakeSession(lambda params: FakeResponse(200, {"code": 200, "data": {}}))
     with pytest.raises(api.WalleCubeAuthError):
         run(api.WalleCubeApi(session).login("a@example.com", "123456"))
+
+
+@pytest.mark.parametrize(
+    "body",
+    [
+        {"code": 200, "data": [dev(1)], "total": 1},
+        {"code": 200, "data": [dev(1)], "total": 1, "pagination": None},
+        {"code": 200, "data": [dev(1)], "total": 1, "pagination": {"currentPage": 1}},
+    ],
+)
+def test_missing_pagination_is_an_error(body: dict) -> None:
+    session = FakeSession(lambda params: FakeResponse(200, body))
+    with pytest.raises(api.WalleCubeConnectionError):
+        run(api.WalleCubeApi(session, "t").get_devices())
+
+
+def test_negative_total_is_an_error() -> None:
+    session = FakeSession(by_page({1: page([dev(1)], None, -1)}))
+    with pytest.raises(api.WalleCubeConnectionError):
+        run(api.WalleCubeApi(session, "t").get_devices())
+
+
+@pytest.mark.parametrize(
+    "exc", [aiohttp.ClientError("boom"), asyncio.TimeoutError()]
+)
+def test_network_errors_are_connection_errors(exc: BaseException) -> None:
+    session = FakeSession(lambda params: RaisingResponse(exc))
+    with pytest.raises(api.WalleCubeConnectionError):
+        run(api.WalleCubeApi(session, "t").get_devices())
+
+
+def test_device_request_url_and_headers() -> None:
+    session = FakeSession(by_page({1: page([dev(1)], None, 1)}))
+    run(api.WalleCubeApi(session, "secret-token", language="ru_RU").get_devices())
+    req = session.requests[0]
+    assert req["method"] == "GET"
+    assert req["url"] == "https://ups.fenjilab.com/api/v1/cs/devices"
+    assert req["headers"]["Authorization"] == "Bearer secret-token"
+    assert req["headers"]["App-Version"] == api.APP_VERSION
+    assert req["headers"]["Accept-Language"] == "ru_RU"
+
+
+def test_login_requests_have_no_token() -> None:
+    session = FakeSession(lambda params: FakeResponse(
+        200, {"code": 200, "data": {"token": "abc"}}))
+    client = api.WalleCubeApi(session)
+    run(client.request_code("a@example.com"))
+    run(client.login("a@example.com", "123456"))
+    send, login = session.requests
+    assert send["url"].endswith("/api/v1/publics/sign/token")
+    assert send["json"] == {"username": "a@example.com", "type": "2"}
+    assert login["url"].endswith("/api/v1/publics/signup")
+    assert login["json"] == {"username": "a@example.com", "token": "123456"}
+    assert "Authorization" not in send["headers"]
+    assert "Authorization" not in login["headers"]
