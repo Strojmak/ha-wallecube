@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import asyncio
 import importlib.util
+import logging
 from pathlib import Path
 from typing import Any, Callable
 
@@ -119,13 +120,14 @@ def test_missing_total_relies_on_next_page() -> None:
     assert imeis(run(api.WalleCubeApi(session, "t").get_devices())) == ["IMEI1"]
 
 
-def test_numeric_string_total_is_checked() -> None:
-    session = FakeSession(by_page({1: page([dev(1)], None, "2")}))
+@pytest.mark.parametrize("total", ["2", " 2 ", "+2"])
+def test_numeric_string_total_is_checked(total: str) -> None:
+    session = FakeSession(by_page({1: page([dev(1)], None, total)}))
     with pytest.raises(api.WalleCubeConnectionError):
         run(api.WalleCubeApi(session, "t").get_devices())
 
 
-@pytest.mark.parametrize("total", [None, "n/a", True, 1.5])
+@pytest.mark.parametrize("total", [None, "n/a", "1.0", True, 1.5])
 def test_unusable_total_is_ignored(total: Any) -> None:
     session = FakeSession(by_page({1: page([dev(1)], None, total)}))
     assert imeis(run(api.WalleCubeApi(session, "t").get_devices())) == ["IMEI1"]
@@ -213,8 +215,9 @@ def test_missing_pagination_is_an_error(body: dict) -> None:
         run(api.WalleCubeApi(session, "t").get_devices())
 
 
-def test_negative_total_is_an_error() -> None:
-    session = FakeSession(by_page({1: page([dev(1)], None, -1)}))
+@pytest.mark.parametrize("total", [-1, "-3"])
+def test_negative_total_is_an_error(total: Any) -> None:
+    session = FakeSession(by_page({1: page([dev(1)], None, total)}))
     with pytest.raises(api.WalleCubeConnectionError):
         run(api.WalleCubeApi(session, "t").get_devices())
 
@@ -252,3 +255,28 @@ def test_login_requests_have_no_token() -> None:
     assert login["json"] == {"username": "a@example.com", "token": "123456"}
     assert "Authorization" not in send["headers"]
     assert "Authorization" not in login["headers"]
+
+
+class _Records(logging.Handler):
+    def __init__(self) -> None:
+        super().__init__()
+        self.messages: list[str] = []
+
+    def emit(self, record: logging.LogRecord) -> None:
+        self.messages.append(record.getMessage())
+
+
+def test_records_without_imei_are_skipped_and_reported_once() -> None:
+    body = page([dev(1), {"imei": ""}, {"log": {}}, "junk"], None, 1)
+    session = FakeSession(lambda params: FakeResponse(200, body))
+    client = api.WalleCubeApi(session, "t")
+    handler = _Records()
+    api._LOGGER.addHandler(handler)
+    try:
+        assert imeis(run(client.get_devices())) == ["IMEI1"]
+        assert imeis(run(client.get_devices())) == ["IMEI1"]
+    finally:
+        api._LOGGER.removeHandler(handler)
+    assert handler.messages == [
+        "Ignoring 3 device record(s) without an IMEI in the cloud answer"
+    ]

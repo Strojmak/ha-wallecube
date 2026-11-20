@@ -8,9 +8,13 @@ from the official WalleCube mobile app. Responses are wrapped as
 from __future__ import annotations
 
 import asyncio
+import logging
+import re
 from typing import Any
 
 import aiohttp
+
+_LOGGER = logging.getLogger(__name__)
 
 API_BASE = "https://ups.fenjilab.com"
 APP_VERSION = "1.0.29"
@@ -54,6 +58,8 @@ class WalleCubeApi:
         self._token = token
         self._language = language
         self._timeout = aiohttp.ClientTimeout(total=timeout)
+        # Number of unusable device records last reported in the log.
+        self._skipped_reported = 0
 
     @property
     def token(self) -> str | None:
@@ -156,6 +162,7 @@ class WalleCubeApi:
         that fails the update, so a partial answer never replaces a full one.
         """
         devices: dict[str, dict[str, Any]] = {}
+        skipped = 0
         total: int | None = None
         for page in range(1, MAX_PAGES + 1):
             payload = await self._request(
@@ -167,6 +174,8 @@ class WalleCubeApi:
             for dev in data:
                 if isinstance(dev, dict) and dev.get("imei"):
                     devices.setdefault(str(dev["imei"]), dev)
+                else:
+                    skipped += 1
             reported = _as_int(payload.get("total"))
             if reported is not None:
                 if reported < 0:
@@ -181,6 +190,13 @@ class WalleCubeApi:
                 break
         else:
             raise WalleCubeConnectionError("Too many device pages")
+        if skipped != self._skipped_reported:
+            self._skipped_reported = skipped
+            if skipped:
+                _LOGGER.warning(
+                    "Ignoring %d device record(s) without an IMEI in the cloud answer",
+                    skipped,
+                )
         if total is not None and len(devices) < total:
             raise WalleCubeConnectionError(
                 f"Incomplete device list: {len(devices)} of {total}"
@@ -188,12 +204,15 @@ class WalleCubeApi:
         return list(devices.values())
 
 
+_INT_STRING = re.compile(r"[+-]?\d+")
+
+
 def _as_int(value: Any) -> int | None:
-    """``total`` as an int; numeric strings are accepted, anything else is not."""
+    """``total`` as an int; integer strings (with sign) are accepted, anything else is not."""
     if isinstance(value, bool):
         return None
     if isinstance(value, int):
         return value
-    if isinstance(value, str) and value.strip().isdigit():
+    if isinstance(value, str) and _INT_STRING.fullmatch(value.strip()):
         return int(value.strip())
     return None
