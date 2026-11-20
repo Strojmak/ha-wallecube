@@ -16,7 +16,12 @@ from homeassistant.helpers.selector import (
     TextSelectorType,
 )
 
-from .api import WalleCubeApi, WalleCubeAuthError, WalleCubeConnectionError, WalleCubeError
+from .api import (
+    WalleCubeApi,
+    WalleCubeAuthError,
+    WalleCubeConnectionError,
+    WalleCubeError,
+)
 from .const import CONF_CODE, CONF_TOKEN, CONF_USER_ID, CONF_USERNAME, DOMAIN
 
 _LOGGER = logging.getLogger(__name__)
@@ -41,6 +46,10 @@ class WalleCubeConfigFlow(ConfigFlow, domain=DOMAIN):
 
     def __init__(self) -> None:
         self._username: str | None = None
+        self._error_detail = ""
+
+    def _placeholders(self) -> dict[str, str]:
+        return {"username": self._username or "", "error": self._error_detail}
 
     def _api(self, token: str | None = None) -> WalleCubeApi:
         return WalleCubeApi(async_get_clientsession(self.hass), token)
@@ -64,6 +73,7 @@ class WalleCubeConfigFlow(ConfigFlow, domain=DOMAIN):
                 errors["base"] = "cannot_connect"
             except WalleCubeError as err:
                 _LOGGER.debug("Sending the code failed: %s", err)
+                self._error_detail = err.api_message or str(err)
                 errors["base"] = "send_code_failed"
             else:
                 return await self.async_step_code()
@@ -72,6 +82,7 @@ class WalleCubeConfigFlow(ConfigFlow, domain=DOMAIN):
             step_id="email",
             data_schema=self.add_suggested_values_to_schema(EMAIL_SCHEMA, suggested),
             errors=errors,
+            description_placeholders=self._placeholders(),
         )
 
     async def async_step_code(
@@ -85,15 +96,17 @@ class WalleCubeConfigFlow(ConfigFlow, domain=DOMAIN):
                 token = await api.login(self._username or "", user_input[CONF_CODE].strip())
             except WalleCubeConnectionError:
                 errors["base"] = "cannot_connect"
-            except WalleCubeAuthError:
-                errors["base"] = "invalid_code"
+            except WalleCubeError as err:
+                _LOGGER.debug("Login failed: %s", err)
+                self._error_detail = err.api_message or str(err)
+                errors["base"] = "login_failed"
             else:
                 return await self._async_finish(token)
         return self.async_show_form(
             step_id="code",
             data_schema=CODE_SCHEMA,
             errors=errors,
-            description_placeholders={"username": self._username or ""},
+            description_placeholders=self._placeholders(),
         )
 
     async def async_step_token(
@@ -131,7 +144,7 @@ class WalleCubeConfigFlow(ConfigFlow, domain=DOMAIN):
                 step_id="code",
                 data_schema=CODE_SCHEMA,
                 errors=errors,
-                description_placeholders={"username": self._username or ""},
+                description_placeholders=self._placeholders(),
             )
 
         user_id = str(me.get("userId") or "")

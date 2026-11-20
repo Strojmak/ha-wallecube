@@ -22,6 +22,7 @@ TO_REDACT = {
     "weatherAdcode",
     "weatherLocationId",
     "logId",
+    "nickname",
 }
 
 

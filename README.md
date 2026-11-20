@@ -15,7 +15,7 @@ Every UPS in your WalleCube account becomes a device in Home Assistant. Units ad
 | Battery | State of charge, % |
 | Input voltage / current / power | Power is calculated from voltage × current |
 | Output voltage / current / power | |
-| Battery voltage / current | |
+| Battery voltage / current | Current as reported by the cloud: positive while charging, negative while discharging |
 | Battery power | **Positive while discharging, negative while charging**, ready for power-flow cards |
 | Time left | Runtime estimate from the UPS. It tends to be optimistic |
 | Temperature | Battery temperature |
@@ -25,7 +25,7 @@ Every UPS in your WalleCube account becomes a device in Home Assistant. Units ad
 | Battery health, cycles, cell voltage spread, last report | Diagnostic |
 | Cell 1–4 voltage, adapter voltage / current settings | Diagnostic, disabled by default |
 
-The cloud is polled once a minute with one request for all units. A unit whose last report is older than 10 minutes is shown as unavailable. The **Online** and **Last report** entities stay available, so you can alert on them.
+The cloud is polled once a minute with one request for all units. A unit whose last report is older than 10 minutes is shown as unavailable. The **Online** entity stays available, and **Last report** keeps the last known time even while the cloud is unreachable, so you can alert on them.
 
 ## Requirements
 
@@ -57,6 +57,10 @@ When the cloud stops accepting the token, Home Assistant shows a **Reconfigure /
 - The cloud updates roughly every 30 seconds; Home Assistant shows values up to about a minute old.
 - *Time left* comes from the UPS firmware and is usually longer than the real runtime.
 - *Battery* (%) from the cloud is real. The USB HID / NUT driver of the same UPS reports a fixed 100 %.
+
+## Removing a unit
+
+When a unit is removed from the WalleCube account, its device stays in Home Assistant and becomes unavailable. Delete it from the device page (**⋮ → Delete**). This is deliberate: the integration never deletes devices on its own, so a glitch in the cloud cannot wipe entities and their settings.
 
 ## Local alternative
 

@@ -41,10 +41,10 @@
     },
     "error": {
       "cannot_connect": "Хмара WalleCube недоступна.",
-      "invalid_code": "Код неправильний або застарів.",
       "invalid_auth": "Хмара відхилила токен.",
-      "send_code_failed": "Хмара відмовилася надіслати код на цей e-mail.",
-      "unknown": "Неочікувана помилка."
+      "send_code_failed": "Хмара відмовилася надіслати код: {error}",
+      "unknown": "Неочікувана помилка.",
+      "login_failed": "Хмара відмовила у вході: {error}"
     },
     "abort": {
       "already_configured": "Цей обліковий запис уже додано.",

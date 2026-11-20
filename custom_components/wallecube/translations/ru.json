@@ -41,10 +41,10 @@
     },
     "error": {
       "cannot_connect": "Облако WalleCube недоступно.",
-      "invalid_code": "Код неверный или устарел.",
       "invalid_auth": "Облако отклонило токен.",
-      "send_code_failed": "Облако отказалось отправить код на этот e-mail.",
-      "unknown": "Непредвиденная ошибка."
+      "send_code_failed": "Облако отказалось отправить код: {error}",
+      "unknown": "Непредвиденная ошибка.",
+      "login_failed": "Облако отказало во входе: {error}"
     },
     "abort": {
       "already_configured": "Эта учётная запись уже добавлена.",

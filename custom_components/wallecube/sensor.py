@@ -277,6 +277,11 @@ class WalleCubeLastReport(WalleCubeEntity, SensorEntity):
 
     always_available = True
 
+    @property
+    def available(self) -> bool:
+        # Keep the last known report time visible while the cloud is down.
+        return self.native_value is not None
+
     def __init__(self, coordinator: WalleCubeCoordinator, imei: str) -> None:
         super().__init__(
             coordinator,

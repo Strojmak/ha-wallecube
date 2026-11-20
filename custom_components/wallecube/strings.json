@@ -41,10 +41,10 @@
     },
     "error": {
       "cannot_connect": "Cannot reach the WalleCube cloud.",
-      "invalid_code": "The code is wrong or has expired.",
       "invalid_auth": "The cloud rejected the token.",
-      "send_code_failed": "The cloud refused to send a code to this e-mail.",
-      "unknown": "Unexpected error."
+      "send_code_failed": "The cloud refused to send a code: {error}",
+      "unknown": "Unexpected error.",
+      "login_failed": "The cloud refused the login: {error}"
     },
     "abort": {
       "already_configured": "This account is already configured.",
